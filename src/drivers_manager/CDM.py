@@ -8,7 +8,7 @@ import zipfile as zp
 import datetime as dt
 
 
-class DriverManager:
+class CDM:
 
     def __init__(self) -> None:
         self.platform: str = sys.platform
