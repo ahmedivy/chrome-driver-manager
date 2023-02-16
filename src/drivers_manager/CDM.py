@@ -9,6 +9,9 @@ import datetime as dt
 
 
 class CDM:
+    """
+    Chrome Drivers Manager
+    """
 
     def __init__(self) -> None:
         self.platform: str = sys.platform
