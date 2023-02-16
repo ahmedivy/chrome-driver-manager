@@ -5,6 +5,7 @@ import wget
 import json
 import requests
 import zipfile as zp
+import datetime as dt
 
 
 class DriverManager:
@@ -50,6 +51,10 @@ class DriverManager:
 
         # Remove Zip File
         os.remove(os.path.join(self.filesPath, compatibleBuild))
+        
+        # Update Config
+        
+        self.config["downloadedDrivers"].append(driverVersion)
 
     def getChromeVersion(self) -> str:
         """
@@ -190,7 +195,7 @@ class DriverManager:
     def __readConfig(self) -> dict:
         """
         This function reads config.json file and returns the contents as a dict.
-        If the file does not exist, it creates the file and returns an empty dict.
+        If the file does not exist, it creates the file with default config.
 
         Returns:
             dict: config
@@ -200,13 +205,20 @@ class DriverManager:
             with open(configPath, "r") as configFile:
                 return json.load(configFile)
         else:
-            open(configPath, "w").close()
-            return dict()
+            dfConfig = {
+                "downloadedDrivers": [],
+                "currentChromeVersion": "",
+                "lastUpdated": dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            }
+            with open(configPath, "w") as configFile:
+                json.dump(dfConfig, configFile, indent=4)
+            return dfConfig
 
     def __updateConfig(self) -> dict:
         """
         This function updates the config file.
         """
+        self.config["lastUpdated"] = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         with open(
             os.path.join(
                 self.filesPath, "config.json"
