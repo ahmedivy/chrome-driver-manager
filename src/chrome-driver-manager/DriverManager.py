@@ -15,7 +15,7 @@ class DriverManager:
         self.chromeVersion: str = self.getChromeVersion()
         self.config: dict = self.__readConfig()
         self.filesPath: str = os.path.join(
-            os.path.expanduser("~"), 
+            os.path.expanduser("~"),
             ".chrome-drivers"
         )
         self.__ensureDir(self.filesPath)
@@ -26,15 +26,15 @@ class DriverManager:
         chrome driver version from the chrome driver website.Returns, if the driver
         is already downloaded.
         """
-        
+
         # Get Driver Version compatible with current Chrome Version
         driverVersion = self.__getCompatibleDriver(version)
-        
+
         # Check if driver already downloaded
         if os.path.exists(os.path.join(self.filesPath, driverVersion)):
             print("Driver already downloaded")
             return
-        
+
         # Download Driiver
         compatibleBuild = f'chromedriver_{self.__getBuildTarget()}.zip'
         downloadUrl = \
@@ -50,13 +50,13 @@ class DriverManager:
             zip_ref.extractall(downloadDir)
 
         # Remove Zip File
-        os.remove(os.path.join(self.filesPath, compatibleBuild))      
+        os.remove(os.path.join(self.filesPath, compatibleBuild))
 
     def getChromeVersion(self) -> str:
         """
         This function gets the version of chrome installed on the 
         machine, platform independently.
-        
+
 
         Credits: https://gist.github.com/primaryobjects/d5346bf7a173dbded1a70375ff7461b4
         Returns:
@@ -101,7 +101,7 @@ class DriverManager:
         Returns:
             str: Compatible Chrome Driver Version
         """
-        
+
         try:
             response = requests.get(
                 "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_"
@@ -128,7 +128,7 @@ class DriverManager:
         Returns:
             str: build target
         """
-        
+
         return "win32" if self.platform == "win32" else (
             "mac64" if self.platform == "darwin" else "linux64"
         )
@@ -188,7 +188,7 @@ class DriverManager:
 
     def getPath(self) -> str:
         pass
-    
+
     def __readConfig(self) -> dict:
         """
         This function reads config.json file and returns the contents as a dict.
@@ -204,21 +204,25 @@ class DriverManager:
         else:
             open(configPath, "w").close()
             return {}
-        
+
     def __updateConfig(self) -> dict:
         """
         This function updates the config file.
         """
-        with open(os.path.join(self.filesPath, "config.json"), "w") as configFile:
+        with open(
+            os.path.join(
+                self.filesPath, "config.json"
+            ),
+            "w"
+        ) as configFile:
             json.dump(self.config, configFile, indent=4)
-        
-        
+
 
 def main():
     manager = DriverManager()
     print(chromeVersion := manager.getChromeVersion())
     print(manager.removePatch(chromeVersion))
-    
+
     manager.downloadDriver(manager.getChromeVersion())
 
 
