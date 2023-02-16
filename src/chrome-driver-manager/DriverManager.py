@@ -20,13 +20,24 @@ class DriverManager:
         )
         self.__ensureDir(self.filesPath)
 
-    def getPath(self):
-        if self.getChromeVersion() == self.config["currentChromeVersion"]:
+    def getPath(self) -> str:
+        currChromeVersion = self.getChromeVersion()
+        if currChromeVersion == self.config["currentChromeVersion"]:
             return self.config["lastDownloadDriver"]["driverPath"]
-        
+
         else:
-            pass
-        
+            if self.__getMajorVersion(currChromeVersion) \
+                == self.__getMajorVersion(
+                    self.config["lastDownloadedDriver"]["chromeVersion"]):
+                return self.config["lastDownloadDriver"]["driverPath"]
+            
+            else:
+                print("Compatible Driver Not Found")
+                print(f"Downloading new driver for Chrome Version: {currChromeVersion}")
+                self.downloadDriver(currChromeVersion)
+                return self.config["lastDownloadDriver"]["driverPath"]
+                
+
     def downloadDriver(self, version: str):
         """
         Given the version of chrome currently installed, download the compatible
@@ -113,6 +124,18 @@ class DriverManager:
             )
         )
 
+    def __getMajorVersion(self, version: str) -> str:
+        """
+        Given the full version, returns the major version
+
+        Args:
+            version (str): chrome version
+
+        Returns:
+            str: major version
+        """
+        return version.split(".")[0]
+    
     def __getCompatibleDriver(self, version: str) -> str:
         """
         Given the version of chrome currently installed, get the compatible chrome
