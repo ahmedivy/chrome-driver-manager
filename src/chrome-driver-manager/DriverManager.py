@@ -205,6 +205,13 @@ class DriverManager:
             open(configPath, "w").close()
             return {}
         
+    def __updateConfig(self) -> dict:
+        """
+        This function updates the config file.
+        """
+        with open(os.path.join(self.filesPath, "config.json"), "w") as configFile:
+            json.dump(self.config, configFile, indent=4)
+        
         
 
 def main():
