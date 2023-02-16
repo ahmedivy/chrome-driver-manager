@@ -13,35 +13,34 @@ class DriverManager:
     def __init__(self) -> None:
         self.platform: str = sys.platform
         self.chromeVersion: str = self.getChromeVersion()
-        self.config: dict = self.__readConfig()
         self.filesPath: str = os.path.join(
             os.path.expanduser("~"),
             ".chrome-drivers"
         )
         self.__ensureDir(self.filesPath)
+        self.config: dict = self.__readConfig()
 
     def getPath(self) -> str:
-        currChromeVersion = self.getChromeVersion()
         if  not self.config["currentChromeVersion"]:
-            print("Downloading new driver for Chrome Version: {currChromeVersion}")
-            self.downloadDriver(currChromeVersion)
-            return self.config["lastDownloadDriver"]["driverPath"]
+            print(f"Downloading new driver for Chrome Version: {self.chromeVersion}")
+            self.downloadDriver(self.chromeVersion)
+            return self.config["lastDownloadedDriver"]["driverPath"]
         
         
-        if currChromeVersion == self.config["currentChromeVersion"]:
-            return self.config["lastDownloadDriver"]["driverPath"]
+        if self.chromeVersion == self.config["currentChromeVersion"]:
+            return self.config["lastDownloadedDriver"]["driverPath"]
 
-        if self.__getMajorVersion(currChromeVersion) \
+        if self.__getMajorVersion(self.chromeVersion) \
             == self.__getMajorVersion(
                 self.config["lastDownloadedDriver"]["chromeVersion"]
         ):
-            return self.config["lastDownloadDriver"]["driverPath"]
+            return self.config["lastDownloadedDriver"]["driverPath"]
 
         else:
             print("Compatible Driver Not Found")
-            print(f"Downloading new driver for Chrome Version: {currChromeVersion}")
-            self.downloadDriver(currChromeVersion)
-            return self.config["lastDownloadDriver"]["driverPath"]
+            print(f"Downloading new driver for Chrome Version: {self.chromeVersion}")
+            self.downloadDriver(self.chromeVersion)
+            return self.config["lastDownloadedDriver"]["driverPath"]
 
     def downloadDriver(self, version: str):
         """
