@@ -1,11 +1,10 @@
 import os
 import re
 import sys
-import json
 import wget
+import json
 import requests
-from typing import Union
-from zipfile import ZipFile
+import zipfile as zp
 
 
 class DriverManager:
@@ -46,7 +45,7 @@ class DriverManager:
         self.__ensureDir(downloadDir)
 
         # Extract Files
-        with ZipFile(os.path.join(self.filesPath, compatibleBuild), 'r') as zip_ref:
+        with zp.ZipFile(os.path.join(self.filesPath, compatibleBuild), 'r') as zip_ref:
             zip_ref.extractall(downloadDir)
 
         # Remove Zip File
@@ -133,7 +132,7 @@ class DriverManager:
             "mac64" if self.platform == "darwin" else "linux64"
         )
 
-    def __extractVersionRegistry(self, output) -> Union[str, None]:
+    def __extractVersionRegistry(self, output) -> str:
         """
         This function extracts the version of chrome from the registry.
         """
@@ -148,7 +147,7 @@ class DriverManager:
         except TypeError:
             return
 
-    def __extractVersionFolder(self) -> Union[str, None]:
+    def __extractVersionFolder(self) -> str:
         """
         This function extracts the version of chrome from the program files.
 
@@ -195,7 +194,7 @@ class DriverManager:
         If the file does not exist, it creates the file and returns an empty dict.
 
         Returns:
-            dict: _description_
+            dict: config
         """
         configPath = os.path.join(self.filesPath, "config.json")
         if os.path.exists(configPath):
@@ -203,7 +202,7 @@ class DriverManager:
                 return json.load(configFile)
         else:
             open(configPath, "w").close()
-            return {}
+            return dict()
 
     def __updateConfig(self) -> dict:
         """
