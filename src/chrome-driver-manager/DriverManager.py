@@ -20,6 +20,13 @@ class DriverManager:
         )
         self.__ensureDir(self.filesPath)
 
+    def getPath(self):
+        if self.getChromeVersion() == self.config["currentChromeVersion"]:
+            return self.config["lastDownloadDriver"]["driverPath"]
+        
+        else:
+            pass
+        
     def downloadDriver(self, version: str):
         """
         Given the version of chrome currently installed, download the compatible
@@ -51,10 +58,22 @@ class DriverManager:
 
         # Remove Zip File
         os.remove(os.path.join(self.filesPath, compatibleBuild))
-        
+
         # Update Config
-        
-        self.config["downloadedDrivers"].append(driverVersion)
+        driverConfig = {
+            "version": driverVersion,
+            "chromeVersion": version,
+            "driverPath": (
+                os.path.join(
+                    downloadDir, "chromedriver.exe"
+                )
+            ),
+            "downloadedOn": dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        }
+        self.config["downloadedDrivers"].append(driverConfig)
+        self.config["lastDownloadedDriver"] = driverConfig
+        self.config["currentChromeVersion"] = version
+        self.__updateConfig()
 
     def getChromeVersion(self) -> str:
         """
@@ -157,7 +176,7 @@ class DriverManager:
         This function extracts the version of chrome from the program files.
 
         Returns:
-            Union[str, None]: chrome version
+            str: chrome version
         """
         for i in range(2):
             path = (
@@ -189,9 +208,6 @@ class DriverManager:
         lastDotIndex = version.rfind(".")
         return version[:lastDotIndex] if lastDotIndex != -1 else version
 
-    def getPath(self) -> str:
-        pass
-
     def __readConfig(self) -> dict:
         """
         This function reads config.json file and returns the contents as a dict.
@@ -208,6 +224,7 @@ class DriverManager:
             dfConfig = {
                 "downloadedDrivers": [],
                 "currentChromeVersion": "",
+                "lastDownloadedDriver": {},
                 "lastUpdated": dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             }
             with open(configPath, "w") as configFile:
@@ -218,7 +235,8 @@ class DriverManager:
         """
         This function updates the config file.
         """
-        self.config["lastUpdated"] = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.config["lastUpdated"] = dt.datetime.now().strftime(
+            "%d/%m/%Y %H:%M:%S")
         with open(
             os.path.join(
                 self.filesPath, "config.json"
