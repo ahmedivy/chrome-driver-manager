@@ -274,13 +274,3 @@ class DriverManager:
         ) as configFile:
             json.dump(self.config, configFile, indent=4)
 
-
-def main():
-    manager = DriverManager()
-    print(chromeVersion := manager.getChromeVersion())
-    print(manager.removePatch(chromeVersion))
-
-    manager.downloadDriver(manager.getChromeVersion())
-
-
-main()
