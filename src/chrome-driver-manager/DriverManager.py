@@ -181,7 +181,6 @@ class DriverManager:
         Returns:
             str: chrome version without patch
         """
-        version = str(version)
         lastDotIndex = version.rfind(".")
         return version[:lastDotIndex] if lastDotIndex != -1 else version
 
