@@ -22,21 +22,26 @@ class DriverManager:
 
     def getPath(self) -> str:
         currChromeVersion = self.getChromeVersion()
+        if  not self.config["currentChromeVersion"]:
+            print("Downloading new driver for Chrome Version: {currChromeVersion}")
+            self.downloadDriver(currChromeVersion)
+            return self.config["lastDownloadDriver"]["driverPath"]
+        
+        
         if currChromeVersion == self.config["currentChromeVersion"]:
             return self.config["lastDownloadDriver"]["driverPath"]
 
+        if self.__getMajorVersion(currChromeVersion) \
+            == self.__getMajorVersion(
+                self.config["lastDownloadedDriver"]["chromeVersion"]
+        ):
+            return self.config["lastDownloadDriver"]["driverPath"]
+
         else:
-            if self.__getMajorVersion(currChromeVersion) \
-                == self.__getMajorVersion(
-                    self.config["lastDownloadedDriver"]["chromeVersion"]):
-                return self.config["lastDownloadDriver"]["driverPath"]
-            
-            else:
-                print("Compatible Driver Not Found")
-                print(f"Downloading new driver for Chrome Version: {currChromeVersion}")
-                self.downloadDriver(currChromeVersion)
-                return self.config["lastDownloadDriver"]["driverPath"]
-                
+            print("Compatible Driver Not Found")
+            print(f"Downloading new driver for Chrome Version: {currChromeVersion}")
+            self.downloadDriver(currChromeVersion)
+            return self.config["lastDownloadDriver"]["driverPath"]
 
     def downloadDriver(self, version: str):
         """
@@ -64,7 +69,10 @@ class DriverManager:
         self.__ensureDir(downloadDir)
 
         # Extract Files
-        with zp.ZipFile(os.path.join(self.filesPath, compatibleBuild), 'r') as zip_ref:
+        with zp.ZipFile(
+            os.path.join(self.filesPath, compatibleBuild),
+            'r'
+        ) as zip_ref:
             zip_ref.extractall(downloadDir)
 
         # Remove Zip File
@@ -74,10 +82,8 @@ class DriverManager:
         driverConfig = {
             "version": driverVersion,
             "chromeVersion": version,
-            "driverPath": (
-                os.path.join(
-                    downloadDir, "chromedriver.exe"
-                )
+            "driverPath": os.path.join(
+                downloadDir, "chromedriver.exe"
             ),
             "downloadedOn": dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
         }
@@ -135,7 +141,7 @@ class DriverManager:
             str: major version
         """
         return version.split(".")[0]
-    
+
     def __getCompatibleDriver(self, version: str) -> str:
         """
         Given the version of chrome currently installed, get the compatible chrome
@@ -246,7 +252,7 @@ class DriverManager:
         else:
             dfConfig = {
                 "downloadedDrivers": [],
-                "currentChromeVersion": "",
+                "currentChromeVersion": None,
                 "lastDownloadedDriver": {},
                 "lastUpdated": dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             }
